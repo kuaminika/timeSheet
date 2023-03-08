@@ -12,8 +12,8 @@
         <script type="text/javascript" src="factory/TimeLog.js"> </script>
         <script type="text/javascript">
             // note changing the db bname implies new data
-            let name = "newName3.7";
-            let version = 20;
+            let name = "K.Timesheet";
+            let version = 3;
 
             function init(whenInitDone){
                 whenInitDone = whenInitDone ||function(confings){
@@ -34,21 +34,6 @@
                             // you create object stores AKA tables here
                             console.log('updating db:');
                             console.log("updgradedDb",upgradeDb);
-                            if (!upgradeDb.objectStoreNames.contains('people')) {
-                                const peopleOS = upgradeDb.createObjectStore('people', { keyPath: 'email' });
-                                peopleOS.createIndex('gender', 'gender', { unique: false });
-                                peopleOS.createIndex('ssn', 'ssn', { unique: true });
-                            }
-                            if (!upgradeDb.objectStoreNames.contains('notes')) {
-                                const notesOS = upgradeDb.createObjectStore('notes', { autoIncrement: true });
-                                notesOS.createIndex('title', 'title', { unique: false });
-                            }
-                            if (!upgradeDb.objectStoreNames.contains('logs')) {
-                                upgradeDb.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
-                            }
-                            if (!upgradeDb.objectStoreNames.contains('store')) {
-                                upgradeDb.createObjectStore('store', { keyPath: 'id', autoIncrement: true });
-                            }
                             
                             dbGateWay.Tasks.setUp(upgradeDb);
                             dbGateWay.TimeLogs.setUp(upgradeDb);
@@ -75,14 +60,6 @@
                     db =  event.target.result;
 
 
-                    const tx = db.transaction(['store'], 'readwrite');
-                    const store = tx.objectStore('store');
-                    const item = {
-                        name: 'sandwich',
-                        price: 4.99,
-                        description: 'A very tasty sandwich',
-                        created: new Date().getTime(),
-                    };
                     console.log(dbGateWay);
                     let newTask = factories.Tasks.createNew();
                     let addRequest =  dbGateWay.Tasks.add(newTask);
@@ -90,34 +67,26 @@
                     addRequest =  dbGateWay.Tasks.findAll();
                     addRequest.then(console.log);
                     
-                  /*  store.add(item);
-                     tx.oncomplete  = ()=>{
-                            console.log('Added item to the store!');
-                     }
-                     tx.onerror  = (err)=>{
-                        console.log(`error inserting item ${JSON.stringify(item)}`,err)
-                     }*/
-                  /*  let cursorWrap =   store.openCursor();
-                     cursorWrap.onsuccess = (e)=>{
-                           // Get a reference to the cursor
-                          const cursor = e.target.result;
+                   let taskToLogTimeToQuery =   dbGateWay.Tasks.findByCode("NEW00001678249626445");
+                   taskToLogTimeToQuery.then(t=>{
 
-                         // console.log(cursor);
+                        if(!t.length)
+                        {
+                            console.log("nothing is found");
+                            return;
+                        }
+                        let taskFound = t[0];
+                        let log = factories.TimeLogs.createNewFor({task:taskFound,timeWorked:5});
+                        console.log(log);
 
-                           // If there is still another data item to iterate through, keep running this code
-                             if (cursor) {
-                                console.log(cursor.value);
-                                cursor.continue();
-                             }
+                        dbGateWay.TimeLogs.add(log).then(msg=>{
+                            console.log(msg);
+                           dbGateWay.TimeLogs.findAll().then(console.log);
+                        });
 
-                     }
-                     console.log("cursorWrap",cursorWrap)*/
-                    let query =  store.getAll()
-                    query.onsuccess = ()=>{
-                            console.log(query.result);
-                        let stage = document.getElementById("stage");
-                            stage.innerText = JSON.stringify(query.result);
-                     }
+                   });
+
+                   
 
 
                 }
