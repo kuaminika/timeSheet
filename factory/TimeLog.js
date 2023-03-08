@@ -4,10 +4,11 @@ window.factories = window.factories || {};
     
     function TimeLog(){
         let self = this;
-        self.Day =`NEW0000${new Date().getTime()}`;
+        let today = new Date();
+        self.Day =`${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
         self.comment = "This is a time log for a task";
         self.hoursWorked = 0.5;
-        self.taskId = -1;
+        self.taskID = -1;
     }
 
 
@@ -15,9 +16,11 @@ window.factories = window.factories || {};
     {
         let self = this;
 
-        self.createNew =   (task)=>{
+        self.createNewFor =   (args)=>{
             let result = new TimeLog();
-            result.taskId = task.id;
+            result.taskID = args.task.id;
+            if(args.timeWorked)
+                result.hoursWorked = args.timeWorked;
             return result;
         };
 
