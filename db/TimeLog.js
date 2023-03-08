@@ -14,7 +14,7 @@ window.dbGateWay = window.dbGateWay || {};
             if (upgradeDb.objectStoreNames.contains(store.name))return;    
             console.log("added:",store.name);
             const storeOS = upgradeDb.createObjectStore(store.name, { keyPath:'id',autoIncrement:true });
-            storeOS.createIndex('taskId', 'taskId', { unique: true });
+            storeOS.createIndex('taskID', 'taskID', { unique: false });
         }
 
         store.deleteAll= base.deleteAll.bind(base);
