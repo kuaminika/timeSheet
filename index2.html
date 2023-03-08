@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="db/gateWay.js"></script>
+        <script type="text/javascript" src="db/Task.js?1" ></script>
+        <script type="text/javascript" src="db/TimeLog.js" ></script>
+        <script type="text/javascript" src="factory/Tasks.js"> </script>
+        <script type="text/javascript" src="factory/TimeLog.js"> </script>
+        <script type="text/javascript">
+            // note changing the db bname implies new data
+            let name = "newName3.7";
+            let version = 20;
+
+            function init(whenInitDone){
+                whenInitDone = whenInitDone ||function(confings){
+
+                    console.log("init is done. but whenInitDone mehtod is not defined");
+                    console.log("configsAreAsFollows",confings);
+
+                };
+                if (!('indexedDB' in window)) {
+                    console.log("This browser doesn't support IndexedDB");
+                    return;
+                }
+                const dbPromise = indexedDB.open(name, version);
+                
+                dbPromise.onupgradeneeded  = ()=>{
+                            let upgradeDb = dbPromise.result;
+                            
+                            // you create object stores AKA tables here
+                            console.log('updating db:');
+                            console.log("updgradedDb",upgradeDb);
+                            if (!upgradeDb.objectStoreNames.contains('people')) {
+                                const peopleOS = upgradeDb.createObjectStore('people', { keyPath: 'email' });
+                                peopleOS.createIndex('gender', 'gender', { unique: false });
+                                peopleOS.createIndex('ssn', 'ssn', { unique: true });
+                            }
+                            if (!upgradeDb.objectStoreNames.contains('notes')) {
+                                const notesOS = upgradeDb.createObjectStore('notes', { autoIncrement: true });
+                                notesOS.createIndex('title', 'title', { unique: false });
+                            }
+                            if (!upgradeDb.objectStoreNames.contains('logs')) {
+                                upgradeDb.createObjectStore('logs', { keyPath: 'id', autoIncrement: true });
+                            }
+                            if (!upgradeDb.objectStoreNames.contains('store')) {
+                                upgradeDb.createObjectStore('store', { keyPath: 'id', autoIncrement: true });
+                            }
+                            
+                            dbGateWay.Tasks.setUp(upgradeDb);
+                            dbGateWay.TimeLogs.setUp(upgradeDb);
+                            console.log("updgradedDb",upgradeDb);
+                            console.log("dbGateWay",dbGateWay)
+                    
+                    };
+
+                    let configuration = {};
+
+                    configuration.db = dbPromise;
+
+                    whenInitDone(configuration);
+
+              //  dbPromise.then(console.log) the then thing does not twork
+            }
+         //   init();
+           init(confings=>{
+
+                console.log(confings)
+                let dbPromise = confings.db;
+                dbPromise.onsuccess =function (e) {
+                     console.log("Database opened successfully");
+                    db =  event.target.result;
+
+
+                    const tx = db.transaction(['store'], 'readwrite');
+                    const store = tx.objectStore('store');
+                    const item = {
+                        name: 'sandwich',
+                        price: 4.99,
+                        description: 'A very tasty sandwich',
+                        created: new Date().getTime(),
+                    };
+                    console.log(dbGateWay);
+                    let newTask = factories.Tasks.createNew();
+                    let addRequest =  dbGateWay.Tasks.add(newTask);
+                    addRequest.then(console.log);
+                    addRequest =  dbGateWay.Tasks.findAll();
+                    addRequest.then(console.log);
+                    
+                  /*  store.add(item);
+                     tx.oncomplete  = ()=>{
+                            console.log('Added item to the store!');
+                     }
+                     tx.onerror  = (err)=>{
+                        console.log(`error inserting item ${JSON.stringify(item)}`,err)
+                     }*/
+                  /*  let cursorWrap =   store.openCursor();
+                     cursorWrap.onsuccess = (e)=>{
+                           // Get a reference to the cursor
+                          const cursor = e.target.result;
+
+                         // console.log(cursor);
+
+                           // If there is still another data item to iterate through, keep running this code
+                             if (cursor) {
+                                console.log(cursor.value);
+                                cursor.continue();
+                             }
+
+                     }
+                     console.log("cursorWrap",cursorWrap)*/
+                    let query =  store.getAll()
+                    query.onsuccess = ()=>{
+                            console.log(query.result);
+                        let stage = document.getElementById("stage");
+                            stage.innerText = JSON.stringify(query.result);
+                     }
+
+
+                }
+            });
+
+            
+        </script>
+
+
+    </head>
+    <body>
+        <div id="stage"></div>
+    </body>
+</html>
