@@ -44,10 +44,10 @@
                 const objectStore = transaction.objectStore(store.name);
                 const index = objectStore.index(indexName);
 
-                console.log(`search by '${indexName}'in store:${store.name}`);
+                console.log(`search by '${indexName}'in store:${store.name}`,`parameter ${searchParameter}`);
                 let query =  index.getAll(searchParameter);
                 query.onsuccess = ()=>{
-                    console.log(`search by '${indexName}'in store:${store.name}`,query.result)
+                    console.log(`search by '${indexName}'in store:${store.name}`,`parameter ${searchParameter}`,query.result)
                     acc(query.result)
                 }
 
@@ -124,8 +124,7 @@
         }
         
         store.add = specimen =>{
-            //       db =  event.target.result;    
-                   console.log(db);
+            
                    // open a read/write db transaction, ready for adding the data
                    const transaction = db.transaction([store.name], "readwrite");
                    // call an object store that's already been added to the database
@@ -141,8 +140,8 @@
                    let promiseResult = new Promise((acc, rej)=>{                    
                        addRequest.onsuccess = acc;
                        addRequest.onerror = ()=>{                    
-                           console.error("Error", query.error);
-                           if(rej) rej(query);    
+                           console.error("Error", event.target.error);
+                           if(rej) rej( event.target.error);    
                        }
    
                    });
