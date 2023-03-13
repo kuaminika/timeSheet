@@ -1,0 +1,1 @@
+- add an "add" button inside of the timelogs view. 
