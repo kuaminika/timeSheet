@@ -1,5 +1,5 @@
 window.dbGateWay = window.dbGateWay  ||{}; 
-
+//TODO make sure that dbGateWay is not an attribute of window
 
 ((dbGateWay)=>{
 
@@ -16,11 +16,11 @@ window.dbGateWay = window.dbGateWay  ||{};
             const storeOS = upgradeDb.createObjectStore(store.name, { keyPath:'id',autoIncrement:true });
             storeOS.createIndex('code', 'code', { unique: true });
         }
-
+        store.setDb =base.setDb.bind(base);
         store.deleteAll= base.deleteAll.bind(base);
         store.add = base.add.bind(base);        
         store.findAll = base.findAll.bind(base);
-        store.findById = id=>{return base.findById.bind(base,id)};
+        store.findById = base.findById.bind(base);
         store.findByCode  = code =>{ return base.findByIndex("code",code)}
         //NEW00001678244296911
 

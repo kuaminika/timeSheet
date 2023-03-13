@@ -1,1 +1,2 @@
-- add an "add" button inside of the timelogs view. 
+- add an "add" button inside of the timelogs view.
+- buttons in menu are outside of navbar when screen is small 

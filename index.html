@@ -24,11 +24,19 @@
 
    <script>
       var app = {};
+        let dbName = "k-timesheet";
+        let dbVersion = 1;
+        let app = {dbName,dbVersion};
+        
    </script> 
    
-    <script src="/db/gateWay.js"></script>
-    <script src="/db/Task.js"></script>
-    <script src="/db/TimeLog.js"></script>
+   <script src="service.js"></script>
+   <script src="factory/Tasks.js"></script>
+   <script src="factory/TimeLog.js"></script>
+   <script src="/db/gateWay.js"></script>
+   <script src="/db/Task.js"></script>
+   <script src="/db/TimeLog.js"></script>
+   <script src="/db/init.js"></script>
     <script src="app_views.js"></script>
     <script src="app.js"></script>     
 </body>

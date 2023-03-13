@@ -17,6 +17,7 @@ window.dbGateWay = window.dbGateWay || {};
             storeOS.createIndex('taskID', 'taskID', { unique: false });
         }
 
+        store.setDb =base.setDb.bind(base);
         store.deleteAll= base.deleteAll.bind(base);
         store.add = base.add.bind(base);        
         store.findAll = base.findAll.bind(base);

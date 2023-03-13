@@ -6,6 +6,7 @@
     {
         let store=this;
         store.name = givenName;
+        store.setDb = (newDb)=>(db=newDb);
     
         store.findAll = ()=>{
             let promiseResult = new Promise((acc,rej)=>{
@@ -16,7 +17,7 @@
 
                 let query =  objectStore.getAll()
                 query.onsuccess = ()=>{
-                    console.log(`search by id in store:${store.name}`,query.result)
+                    console.log(`search all in store:${store.name}`,query.result)
                     acc(query.result)
                 }
 
@@ -106,7 +107,12 @@
         store.findById = id=>{
              
             let promiseResult = new Promise((acc,rej)=>{
-                let query =  store.get(id)
+                
+                const transaction = db.transaction([store.name], "readwrite");
+                // call an object store that's already been added to the database
+                const objectStore = transaction.objectStore(store.name);
+              
+                let query =  objectStore.get(id)
                 query.onsuccess = ()=>{
                     console.log(`search by id in store:${store.name}`,query.result)
                     acc(query.result)
@@ -124,7 +130,6 @@
         }
         
         store.add = specimen =>{
-            
                    // open a read/write db transaction, ready for adding the data
                    const transaction = db.transaction([store.name], "readwrite");
                    // call an object store that's already been added to the database

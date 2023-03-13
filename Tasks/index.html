@@ -15,6 +15,7 @@
         right: 1%;
         font-size: x-small;
     }
+    .k-specimen{display: none !important;}
 </style>
 <body>
 
@@ -24,20 +25,30 @@
     <main>  
         <div class="d-row">
             <nav  id="sidebarHolder"  class=" col-md-3 col-lg-2 navbar-expand d-flex flex-column   bg-body-secondary navbar-vertical ">  </nav>
-            <main-stage class="col-md-9 offset-md-3 col-lg-10 offset-lg-2 ">
-                
-                <div class="d-flex  justify-content-between  flex-wrap p-2">
-                    <div class="card mt-2" style="width: 18rem;">
-                        <div class="card-body task-card position-relative">
-                          <h5 class="card-title">TSK000#</h5>
-                          <h6 class="card-subtitle mb-2 text-muted">Id:00#</h6>
-                          <p class="card-text">Description:</br>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                          <a href="#" class="card-link ">edit</a>
-                          <a href="#" class="card-link float-end">delete</a>
-                          <span class="creation-date">2023-03-15 22:46:01</span>
+            <main-stage class="col-md-9 offset-md-3 offset-sm-2 col-lg-10 offset-lg-2 ">
+                <div>
+                    <div id="addBtn" class="btn btn-warning ">add </div>
+                    <form id="addForm" class="d-none flex-column">
+                       <label>code </label> <input type="text" name="code" id="">
+                      
+                       <label>description </label>  <textarea name="description" id="" cols="30" rows="2"></textarea>
+                        <div id="submitBtn" class="btn btn-success" >submit</div>
+                    </form>
+                </div>
+               <task-list-holder class="d-flex  flex-wrap w-100">
+                    <div class="d-flex k-specimen justify-content-between  flex-wrap p-2">
+                        <div class="card mt-2" style="width: 18rem;">
+                            <div class="card-body task-card position-relative">
+                            <h5 class="card-title code-slot ">TSK000#</h5>
+                            <h6 class="card-subtitle mb-2 text-muted id-slot">Id:00#</h6>
+                            <p class="card-text description-slot">Description:</br>Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            <a href="#" class="card-link ">edit</a>
+                            <a href="#" class="card-link float-end">delete</a>
+                            <span class="creation-date">2023-03-15 22:46:01</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+               </task-list-holder>
             </main-stage>
         </div>
     </main>
@@ -45,14 +56,95 @@
 
 
    <script>
-      var app = {};
-      app.currentPage = "Tasks"
-   </script> 
-   
-    <script src="/db/gateWay.js"></script>
-    <script src="/db/Task.js"></script>
-    <script src="/db/TimeLog.js"></script>
-    <script src="../app_views.js"></script>
-    <script src="../app.js"></script>     
+      
+       let currentPage = "Tasks"
+      let dbName ="devk-timesheet";
+      let dbVersion = 1;
+      var app = {dbName,dbVersion,currentPage};
+      
+ </script> 
+ 
+ <script src="../service.js"></script>
+ <script src="/factory/Tasks.js"></script>
+ <script src="/factory/TimeLog.js"></script>
+ <script src="/db/gateWay.js"></script>
+ <script src="/db/Task.js"></script>
+ <script src="/db/TimeLog.js"></script>
+ <script src="/db/init.js"></script>
+  <script src="../app_views.js"></script>
+  <script src="../app.js"></script>   
+  <script>
+    if(!app.service)
+    {
+    console.log("service not init. initing")
+    app.initService({dbGateway:dbGateWay,modelFactory:factories});
+    }//TODO add date created attribute to tasks
+    
+    let addBtn = document.getElementById("addBtn");
+    console.log(addBtn);
+    addBtn.onclick=()=>{
+        let theForm = document.getElementById("addForm");
+        if(addBtn.innerText != "Cancel")
+        {
+            theForm.className = theForm.className.replace("d-none","d-flex");
+            addBtn.innerText = "Cancel";
+            return;
+        }
+        theForm.className = theForm.className.replace("d-flex","d-none");
+            addBtn.innerText = "add";
+
+
+    };
+
+    function removeAllIfAny(){
+       let kTasks = document.getElementsByClassName("k-task");
+       for(let i = 0; i<kTasks.length;i++)
+       {
+        let task = kTasks[i];
+        task.remove();
+       }
+    }
+    function showMany(tasks)
+    {
+        removeAllIfAny();
+        tasks=  tasks.sort((a,b)=>(b.id-a.id));
+        let mainStage = document.getElementsByTagName("task-list-holder")[0];
+        let sample = document.getElementsByClassName("k-specimen")[0];
+        console.log(sample);
+
+        tasks.forEach(task=>{
+          let taskSLide =   sample.cloneNode(true);
+          let idSLot = taskSLide.getElementsByClassName("id-slot")[0];
+          let codeSLot = taskSLide.getElementsByClassName("code-slot")[0];
+          let descriptionSLot = taskSLide.getElementsByClassName("description-slot")[0];
+          codeSLot.innerText = task.code;
+          idSLot.innerText = task.id;
+          taskSLide.className = taskSLide.className.replace("k-specimen","k-task");
+          descriptionSLot.innerText = `Description: ${task.description}`;
+
+          
+          mainStage.append(taskSLide);
+        });
+
+    }
+
+    let submitBtn = document.getElementById("submitBtn");
+    submitBtn.onclick = ()=>{
+
+        let theForm = document.getElementById("addForm");
+        let code = theForm.code.value;
+        let description = theForm.description.value;
+
+        let addRequest =  app.service.addTaskWithDetails(code,description);
+              addRequest.then(app.service.getAllTasks)
+              .then(showMany);
+        theForm.reset();
+        
+        theForm.className = theForm.className.replace("d-flex","d-none");
+            addBtn.innerText = "add";
+    }
+
+    app.service.getAllTasks().then(showMany);
+  </script>       
 </body>
 </html>

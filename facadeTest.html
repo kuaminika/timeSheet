@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        //TODO: find a way to log on page instead of console.
+        let dbName = "facadeTest";
+        let dbVersion = 1;
+        let app = {dbName,dbVersion};
+        
+
+    </script>
+    <script src="service.js"></script>
+    <script src="factory/Tasks.js"></script>
+    <script src="factory/TimeLog.js"></script>
+    <script src="/db/gateWay.js"></script>
+    <script src="/db/Task.js"></script>
+    <script src="/db/TimeLog.js"></script>
+    <script src="/db/init.js"></script>
+    <script>
+        
+        console.warn("testing initiatingService without args","this should fail");
+       
+        try{ 
+            app.initService();
+        }
+        catch(err)
+        {
+            if(err==="FacadeService:args missing")
+           { console.log("error is whats expected:",err)
+            
+            }else
+                console.error(err);
+        }
+        console.warn("testing initiatingService without dbgatewat","this should fail");
+      
+        try
+        {
+             app.initService({});
+        }
+        catch(err)
+        {
+
+            if(err==="FacadeService:dbGateway is missing")
+           { console.log("error is whats expected:",err)
+        
+        }else
+            console.error(err);
+        }
+
+        console.warn("testing initiatingService with dbGateway");
+      
+        try{ 
+          app.initService({dbGateway:dbGateWay,modelFactory:factories});
+          console.log("its created succesfully")
+            
+        }
+        catch(err)
+        {
+           
+            console.error(err);
+        }
+
+        try{ 
+
+             console.warn("testing  addTask")
+              if(!app.service)
+              {
+                console.log("service not init. initing")
+                app.initService({dbGateway:dbGateWay,modelfactory:factories});
+              }
+              let p = new Date().getTime();
+              let addRequest =  app.service.addTaskWithDetails(`task${p}`,"task added with details");
+              addRequest.then(app.service.getAllTasks)
+              .then(console.log);
+            
+            }
+            catch(err)
+            {
+            
+                console.error(err);
+            }
+
+        try{ 
+
+          console.warn("testing  GetAllTasks");
+          if(!app.service)
+          {
+            console.log("service not init. initing")
+            app.initService({dbGateway:dbGateWay});
+          }
+
+          app.service.getAllTasks();
+            
+        }
+        catch(err)
+        {
+           
+            console.error(err);
+        }
+
+        try{ 
+
+        console.warn("testing  creatTimeLog");
+        if(!app.service)
+        {
+        console.log("service not init. initing")
+        app.initService({dbGateway:dbGateWay});
+        }
+        
+        let request = app.service.logTimeDetails(3,"2023-03-15",4,"adding timelog from facade test");
+        request.then(app.service.getAllTimeLogs)
+        .then(console.log);
+        }
+        catch(err)
+        {
+        
+        console.error(err);
+        }
+
+        try{ 
+
+        console.warn("testing  get all timelogs");
+        if(!app.service)
+        {
+        console.log("service not init. initing")
+        app.initService({dbGateway:dbGateWay});
+        }
+
+        app.service.getAllTimeLogs();
+
+        }
+        catch(err)
+        {
+
+        console.error(err);
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
