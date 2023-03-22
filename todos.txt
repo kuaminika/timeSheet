@@ -1,2 +1,6 @@
 - add an "add" button inside of the timelogs view.
-- buttons in menu are outside of navbar when screen is small 
+- bug:buttons in menu are outside of navbar when screen is small 
+- bug: when adding. sometimes the list does not update properly
+- taskslides should have timelog
+- need to allow edit of taskslides
+- need to allow delete of tasks with no time logs
